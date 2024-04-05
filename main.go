@@ -7,6 +7,7 @@ import (
     "net/http"
     "github.com/redis/go-redis/v9"
     "sort"
+    "os"
     
 )
 
@@ -21,10 +22,11 @@ type User struct {
 
 func main() {
 
-    opt, err := redis.ParseURL("redis://default:ifmv7KSW0H6yjDUV9bpbSOsvMtNDwLZc@redis-10045.c100.us-east-1-4.ec2.cloud.redislabs.com:10045")
+    opt, err := redis.ParseURL(os.Getenv("CONNECTION_STRING"))
     if err != nil {
         panic(err)
     }
+    
    
     redisClient = redis.NewClient(opt)
 
