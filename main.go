@@ -67,17 +67,17 @@ func registerUserHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Set initial points for the new user
+
     newUser.Points = 0
 
-    // Marshal the user data to JSON
+    //converting to json
     userJSON, err := json.Marshal(newUser)
     if err != nil {
         http.Error(w, "Error registering user", http.StatusInternalServerError)
         return
     }
 
-    // Add the new user to Redis
+    // adding redis
     if err := redisClient.Set(context.Background(), newUser.Username, userJSON, 0).Err(); err != nil {
         http.Error(w, "Error registering user", http.StatusInternalServerError)
         return
@@ -90,7 +90,7 @@ func registerUserHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func leaderboardHandler(w http.ResponseWriter, r *http.Request) {
-    // Get all keys (usernames) from Redis
+    
     ctx := context.Background()
     keys, err := redisClient.Keys(ctx, "*").Result()
     if err != nil {
@@ -98,7 +98,6 @@ func leaderboardHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Get user data for each key (username)
     var leaderboard []User
     for _, key := range keys {
         userJSON, err := redisClient.Get(ctx, key).Result()
@@ -114,21 +113,18 @@ func leaderboardHandler(w http.ResponseWriter, r *http.Request) {
         leaderboard = append(leaderboard, user)
     }
 
-    // Sort the leaderboard based on points (descending order)
+    
     sort.Slice(leaderboard, func(i, j int) bool {
         return leaderboard[i].Points > leaderboard[j].Points
     })
 
-    // Set the Content-Type header to indicate JSON content
+    
     w.Header().Set("Content-Type", "application/json")
 
-    // Write the status code (200 OK) to the response
     w.WriteHeader(http.StatusOK)
 
-    // Create a JSON encoder for the response writer
     encoder := json.NewEncoder(w)
 
-    // Encode the leaderboard data directly to the response writer
     if err := encoder.Encode(leaderboard); err != nil {
         http.Error(w, "Failed to generate leaderboard", http.StatusInternalServerError)
         return
@@ -140,7 +136,7 @@ func IncrementPointsHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Read request body
+    // Reading request body
     var reqBody struct {
         Username string `json:"username"`
     }
@@ -149,37 +145,35 @@ func IncrementPointsHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Retrieve user data from Redis
+    // Retrieving user data from Redis
     userJSON, err := redisClient.Get(context.Background(), reqBody.Username).Result()
     if err != nil {
         http.Error(w, "Failed to retrieve user data", http.StatusInternalServerError)
         return
     }
 
-    // Unmarshal user data into User struct
+    // json to user struct
     var user User
     if err := json.Unmarshal([]byte(userJSON), &user); err != nil {
         http.Error(w, "Failed to parse user data", http.StatusInternalServerError)
         return
     }
 
-    // Increment user's points
     user.Points++
 
-    // Marshal updated user data
+    //    to json
     updatedUserJSON, err := json.Marshal(user)
     if err != nil {
         http.Error(w, "Failed to update user data", http.StatusInternalServerError)
         return
     }
 
-    // Update user data in Redis
+    // Updating user data 
     if err := redisClient.Set(context.Background(), user.Username, updatedUserJSON, 0).Err(); err != nil {
         http.Error(w, "Failed to update user data", http.StatusInternalServerError)
         return
     }
 
-    // Return success response
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Points incremented successfully"))
 }
