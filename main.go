@@ -30,13 +30,12 @@ func main() {
    
     redisClient = redis.NewClient(opt)
 
-    // Define HTTP endpoints
  
     http.HandleFunc("/register-user", registerUserHandler)
     http.HandleFunc("/leaderboard", leaderboardHandler)
     http.HandleFunc("/register-win", IncrementPointsHandler)
     
-    // Run the server
+    // Runnnig the server
     fmt.Println("Server running on port 8080")
     if err := http.ListenAndServe(":8080", nil); err != nil {
         fmt.Printf("Failed to start server: %v\n", err)
@@ -49,14 +48,14 @@ func registerUserHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Read request body
+    // Reading the request body
     var newUser User
     if err := json.NewDecoder(r.Body).Decode(&newUser); err != nil {
         http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
         return
     }
 
-    // Check if the user already exists
+    // Checking if user already presen
     userExists, err := redisClient.Exists(context.Background(), newUser.Username).Result()
     if err != nil {
         http.Error(w, "Error checking user existence", http.StatusInternalServerError)
