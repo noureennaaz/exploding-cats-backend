@@ -30,16 +30,28 @@ func main() {
    
     redisClient = redis.NewClient(opt)
 
- 
+    http.HandleFunc("/", handler)
     http.HandleFunc("/register-user", registerUserHandler)
     http.HandleFunc("/leaderboard", leaderboardHandler)
     http.HandleFunc("/register-win", IncrementPointsHandler)
     
     // Runnnig the server
-    fmt.Println("Server running on port 8080")
-    if err := http.ListenAndServe(":8080", nil); err != nil {
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "3000"
+    }
+
+    fmt.Println("Server running on port", port)
+    if err := http.ListenAndServe(":"+port, nil); err != nil {
         fmt.Printf("Failed to start server: %v\n", err)
     }
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+    
+    w.WriteHeader(http.StatusCreated)
+    fmt.Printf("hit successfull" )
+    
 }
 
 func registerUserHandler(w http.ResponseWriter, r *http.Request) {
