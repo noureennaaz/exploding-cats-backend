@@ -55,6 +55,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func registerUserHandler(w http.ResponseWriter, r *http.Request) {
+
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
     if r.Method != http.MethodPost {
         http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
         return
@@ -102,6 +106,10 @@ func registerUserHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func leaderboardHandler(w http.ResponseWriter, r *http.Request) {
+
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
     
     ctx := context.Background()
     keys, err := redisClient.Keys(ctx, "*").Result()
@@ -143,6 +151,11 @@ func leaderboardHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 func IncrementPointsHandler(w http.ResponseWriter, r *http.Request) {
+
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+    
     if r.Method != http.MethodPost {
         http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
         return
@@ -189,6 +202,4 @@ func IncrementPointsHandler(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Points incremented successfully"))
 }
-
-
 
