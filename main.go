@@ -8,13 +8,16 @@ import (
     "github.com/redis/go-redis/v9"
     "sort"
     "os"
+    "log"
     
 )
 
 var (
     redisClient *redis.Client
 )
-
+type WinRequest struct {
+    Username string `json:"username"`
+}
 type User struct {
     Username string `json:"username"`
     Points   int    `json:"points"`
@@ -71,7 +74,7 @@ func registerUserHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Checking if user already presen
+    // Checking if user already present
     userExists, err := redisClient.Exists(context.Background(), newUser.Username).Result()
     if err != nil {
         http.Error(w, "Error checking user existence", http.StatusInternalServerError)
@@ -198,7 +201,7 @@ func IncrementPointsHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Failed to update user data", http.StatusInternalServerError)
         return
     }
-
+    log.Println("Received win registration for username:", user.Username)
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Points incremented successfully"))
 }
